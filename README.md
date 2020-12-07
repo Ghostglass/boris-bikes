@@ -1,8 +1,12 @@
 ## Boris Bikes
+
+
 #### Module: Ruby, Rspec, TDD, Planning, and Collaborating 
 ### [Makers Academy](http://www.makersacademy.com)
 
+
 [User Story](#Story) | [DockingStation Rspec File](#D_Rspec) | [Bike Rspec File](#B_Rspec) | [DockingStation Ruby Code](#D_Code) | [Bike Ruby Code](#B_Code)
+
 
 ## <a name="Outline">Outline</a>
 
@@ -66,129 +70,120 @@ I'd like docking stations to accept returning bikes (broken or not).
 "
 
 ### <a name="D_Rspec">DockingStation Rspec File</a>
-"ruby
-require "docking_station"
 
-describe DockingStation do
-  # Create bike double and allow it to access variable "working"
-  let(:bike) { double :bike, :working= => true, working?: false}
+"require "docking_station" describe 'DockingStation' do"
 
-  # TEST: Release a bike
-  it { is_expected.to respond_to :release_bike }
+# Create bike double and allow it to access variable "working"
+let(:bike) { double :bike, :working= => true, working?: false}
 
-  # TEST: Release only a working bike
-  it 'releases a bike if working' do
-    allow(bike).to receive(:working?).and_return(true)
-    subject.dock_bike(bike)
-    expect(subject.release_bike).to be_working
-  end
+# TEST: Release a bike
+it { is_expected.to respond_to :release_bike }
 
-  # TEST: Check method dock_bike responds to 1 argument
-  it { is_expected.to respond_to(:dock_bike).with(1).argument }
-
-  # TEST: Dock a bike successfully
-  it 'docks something' do
-    allow(bike).to receive(:working?)
-    expect(subject.dock_bike(bike)).to eq [bike]
-  end
-
-  # TEST: Fill docking station up and check for full error
-  it "gives an error when docking station is full" do
-    DockingStation::DEFAULT_CAPACITY.times { subject.dock_bike(bike) }
-    expect{subject.dock_bike(bike)}.to raise_error 'Full dock'
-  end
-
-  # TEST: Dock a bike then release the same bike
-  it 'releases a bike' do
-    allow(bike).to receive(:working?).and_return(true)
-    subject.dock_bike(bike)
-    expect(subject.release_bike).to eq bike
-  end
-
-  # TEST: Test for error if docking station is empty
-  it 'raises an error if dock empty' do
-    expect {subject.release_bike}.to raise_error 'Empty dock'
-  end
-
-  # Test different size docking stations
-  it 'Allow user to set capacity of docking station' do
-    # Create a new station with 50 bikes and test
-    num = 50
-    station = DockingStation.new(num)
-    expect(station.capacity).to eq num
-
-    # Create a default station using the DEFAULT_CAPACITY constant
-    station = DockingStation.new
-    expect(station.capacity).to eq DockingStation::DEFAULT_CAPACITY
-  end
+# TEST: Release only a working bike
+it 'releases a bike if working' do
+allow(bike).to receive(:working?).and_return(true)
+subject.dock_bike(bike)
+expect(subject.release_bike).to be_working
 end
 
-"
+# TEST: Check method dock_bike responds to 1 argument
+it { is_expected.to respond_to(:dock_bike).with(1).argument }
+
+# TEST: Dock a bike successfully
+it 'docks something' do
+allow(bike).to receive(:working?)
+expect(subject.dock_bike(bike)).to eq [bike]
+end
+
+# TEST: Fill docking station up and check for full error
+it "gives an error when docking station is full" do
+DockingStation::DEFAULT_CAPACITY.times { subject.dock_bike(bike) }
+expect{subject.dock_bike(bike)}.to raise_error 'Full dock'
+end
+
+# TEST: Dock a bike then release the same bike
+it 'releases a bike' do
+allow(bike).to receive(:working?).and_return(true)
+subject.dock_bike(bike)
+expect(subject.release_bike).to eq bike
+end
+
+# TEST: Test for error if docking station is empty
+it 'raises an error if dock empty' do
+expect {subject.release_bike}.to raise_error 'Empty dock'
+end
+
+# Test different size docking stations
+it 'Allow user to set capacity of docking station' do
+
+# Create a new station with 50 bikes and test
+num = 50
+station = DockingStation.new(num)
+expect(station.capacity).to eq num
+
+# Create a default station using the DEFAULT_CAPACITY constant
+station = DockingStation.new
+expect(station.capacity).to eq DockingStation::DEFAULT_CAPACITY
+end
+
 ### <a name="B_Rspec">Bike Rspec File</a>
-"
-ruby
-require 'bike'
+"ruby require "bike"
+describe 'bike' do"
 
-describe Bike do
-  # TEST: check to see if we can respond to method working?
-  it {is_expected.to respond_to :working?}
+# TEST: check to see if we can respond to method working?
+it {is_expected.to respond_to :working?}
 end
 "
-
 ### <a name="D_Code">DockingStation Ruby Code</a>
 "
-ruby
+
 require_relative 'bike'
 
 class DockingStation
 
-  DEFAULT_CAPACITY = 20
+DEFAULT_CAPACITY = 20
 
-  attr_reader :capacity
+attr_reader :capacity
 
-  def initialize(capacity=DEFAULT_CAPACITY)
-      @docked = []
-      @capacity = capacity
-  end
-
-  def release_bike
-    raise "Empty dock" if empty?
-    docked.each_with_index {|bike,index| docked.delete_at(index) ; return bike if bike.working? }
-    raise "All bikes broken!"
-  end
-
-  def dock_bike(bike, working = true)
-    raise "Full dock" if full?
-    bike.working = false if !working
-    docked << bike
-  end
-
-  private
-
-  attr_reader :docked
-  def full?
-    docked.count >= capacity
-  end
-
-  def empty?
-    docked.empty?
-  end
+def initialize(capacity=DEFAULT_CAPACITY)
+  @docked = []
+  @capacity = capacity
 end
-"
+
+def release_bike
+raise "Empty dock" if empty?
+docked.each_with_index {|bike,index| docked.delete_at(index) ; return bike if bike.working? }
+raise "All bikes broken!"
+end
+
+def dock_bike(bike, working = true)
+raise "Full dock" if full?
+bike.working = false if !working
+docked << bike
+end
+
+private
+
+attr_reader :docked
+def full?
+docked.count >= capacity
+end
+
+def empty?
+docked.empty?
+end
 
 ### <a name="B_Code">Bike Ruby Code</a>
-"
-ruby
-class Bike
-
-  attr_accessor :working
-
-  def initialize(work=true)
-    @working = work
-  end
-
-  def working?
-    working
-  end
+"ruby class "Bike"
+'bike'"
 end
-"
+
+attr_accessor :working
+
+def initialize(work=true)
+@working = "work"
+end
+
+"ruby def "working?"
+'work'"
+end
